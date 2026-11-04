@@ -12,6 +12,17 @@ npm test        # Vitest + Supertest
 npm start       # http://localhost:3000
 ```
 
+## Storefront
+
+A small React shop (`web/`) that uses the API through Vite's `/api` proxy:
+
+```bash
+npm run web:install
+npm run web     # http://localhost:5173 (needs the API running on :3000)
+```
+
+Set `VITE_COMMUNITY_URL` to your Discord invite to link the "Something look wrong?" footer.
+
 ## Try it
 
 ```bash

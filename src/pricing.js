@@ -9,22 +9,23 @@ export function subtotalOf(cart) {
 
 export function totalsFor(cart) {
   const coupon = cart.coupon ? findCoupon(cart.coupon) : null;
-  const subtotal = subtotalOf(cart);
-  const discount = discountFor(coupon, subtotal);
-  const taxable = subtotal - discount;
-  const tax = taxable * config.taxRate;
+  const cents = (amount) => Math.round(amount * 100);
+  const subtotalCents = cents(subtotalOf(cart));
+  const discountCents = cents(discountFor(coupon, subtotalCents / 100));
+  const taxableCents = subtotalCents - discountCents;
+  const taxCents = Math.round(taxableCents * config.taxRate);
 
-  let shipping = config.shippingFee;
-  if (cart.items.length === 0) shipping = 0;
-  if (coupon?.kind === 'shipping') shipping = 0;
-  if (taxable >= config.freeShippingThreshold) shipping = 0;
+  let shippingCents = cents(config.shippingFee);
+  if (cart.items.length === 0) shippingCents = 0;
+  if (coupon?.kind === 'shipping') shippingCents = 0;
+  if (taxableCents >= cents(config.freeShippingThreshold)) shippingCents = 0;
 
   return {
-    subtotal,
-    discount,
-    tax,
-    shipping,
-    total: taxable + tax + shipping,
+    subtotal: subtotalCents / 100,
+    discount: discountCents / 100,
+    tax: taxCents / 100,
+    shipping: shippingCents / 100,
+    total: (taxableCents + taxCents + shippingCents) / 100,
     coupon: cart.coupon,
   };
 }

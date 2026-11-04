@@ -15,5 +15,6 @@ export function checkCouponRules(coupon, subtotal) {
 
 export function discountFor(coupon, subtotal) {
   if (!coupon || coupon.kind === 'shipping') return 0;
+  if (coupon.kind === 'percent') return (subtotal * coupon.amount) / 100;
   return Math.min(coupon.amount, subtotal);
 }

@@ -10,21 +10,23 @@ export function subtotalOf(cart) {
 export function totalsFor(cart) {
   const coupon = cart.coupon ? findCoupon(cart.coupon) : null;
   const subtotal = subtotalOf(cart);
-  const discount = discountFor(coupon, subtotal);
-  const taxable = subtotal - discount;
-  const tax = taxable * config.taxRate;
+  // Money math in integer cents; round half-up once at the end.
+  const subtotalCents = Math.round(subtotal * 100);
+  const discountCents = Math.round(discountFor(coupon, subtotal) * 100);
+  const taxableCents = subtotalCents - discountCents;
+  const taxCents = Math.round(taxableCents * config.taxRate);
 
-  let shipping = config.shippingFee;
-  if (cart.items.length === 0) shipping = 0;
-  if (coupon?.kind === 'shipping') shipping = 0;
-  if (taxable >= config.freeShippingThreshold) shipping = 0;
+  let shippingCents = Math.round(config.shippingFee * 100);
+  if (cart.items.length === 0) shippingCents = 0;
+  if (coupon?.kind === 'shipping') shippingCents = 0;
+  if (taxableCents >= Math.round(config.freeShippingThreshold * 100)) shippingCents = 0;
 
   return {
-    subtotal,
-    discount,
-    tax,
-    shipping,
-    total: taxable + tax + shipping,
+    subtotal: subtotalCents / 100,
+    discount: discountCents / 100,
+    tax: taxCents / 100,
+    shipping: shippingCents / 100,
+    total: (taxableCents + taxCents + shippingCents) / 100,
     coupon: cart.coupon,
   };
 }

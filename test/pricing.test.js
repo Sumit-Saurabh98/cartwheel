@@ -39,6 +39,16 @@ describe('coupons', () => {
     expect(body.coupon).toBe('FLAT5');
   });
 
+  it('SAVE10 takes 10% off the subtotal', async () => {
+    const id = await cartWith(api, [['p_2', 1]]); // 40.00
+    await api.post(`/carts/${id}/coupon`).send({ code: 'SAVE10' });
+    const { body } = await api.get(`/carts/${id}/total`);
+    expect(body.discount.toFixed(2)).toBe('4.00');
+    expect(body.tax.toFixed(2)).toBe('2.88');
+    expect(body.shipping.toFixed(2)).toBe('4.99');
+    expect(body.total.toFixed(2)).toBe('43.87');
+  });
+
   it('FLAT5 needs a subtotal of 20.00', async () => {
     const id = await cartWith(api, [['p_3', 1]]); // 9.99
     const res = await api.post(`/carts/${id}/coupon`).send({ code: 'FLAT5' });

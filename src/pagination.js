@@ -1,6 +1,6 @@
 export function paginate(items, page, limit) {
   const total = items.length;
-  const totalPages = Math.max(1, Math.floor(total / limit));
+  const totalPages = Math.max(1, Math.ceil(total / limit));
   const start = (page - 1) * limit;
 
   return {

@@ -78,3 +78,15 @@ describe('checkout', () => {
     expect((await api.post(`/carts/${id}/checkout`)).status).toBe(400);
   });
 });
+
+describe('SAVE10 (LOOP-2)', () => {
+  it('takes 10% of the subtotal, not a flat 10.00', async () => {
+    const id = await cartWith(api, [['p_2', 1]]); // Desk mat 40.00
+    await api.post(`/carts/${id}/coupon`).send({ code: 'SAVE10' });
+    const { body } = await api.get(`/carts/${id}/total`);
+    expect(body.discount).toBe(4);
+    expect(body.tax).toBe(2.88);
+    expect(body.shipping).toBe(4.99);
+    expect(body.total).toBe(43.87);
+  });
+});

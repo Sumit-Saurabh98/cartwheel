@@ -35,6 +35,14 @@ describe('GET /products', () => {
     expect(res.body.totalPages).toBe(3);
   });
 
+  it('reaches every product with the default page size (LOOP-3)', async () => {
+    const first = await api.get('/products');
+    expect(first.body.totalPages).toBe(3);
+    const last = await api.get('/products?page=3');
+    expect(last.status).toBe(200);
+    expect(last.body.items.map((p) => p.name)).toEqual(['Headphone hook', 'Coffee mug']);
+  });
+
   it('rejects invalid pagination', async () => {
     expect((await api.get('/products?page=0')).status).toBe(400);
     expect((await api.get('/products?limit=500')).status).toBe(400);
